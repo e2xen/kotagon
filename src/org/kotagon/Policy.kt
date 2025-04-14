@@ -29,8 +29,8 @@ class PolicyBuilderContext internal constructor() {
     inline fun <reified T : Any> any() {
         any(T::class)
     }
-    fun <T> suchThat(predicate: (T) -> Boolean) {
-        predicates.add(predicate)
-        predicates[0].javaClass.
+    fun <T> suchThat(predicate: (LockArg<T>) -> ParametrizedLockExpression) {
+//        predicates.add(predicate)
+//        predicates[0].javaClass.
     }
 }
