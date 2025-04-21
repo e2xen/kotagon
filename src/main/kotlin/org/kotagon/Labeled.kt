@@ -1,6 +1,6 @@
 package org.kotagon
 
-import jdk.jpackage.internal.Arguments.CLIOptions.context
+import jdk.dynalink.linker.support.Guards.isInstance
 import org.kotagon.exception.InformationFlowException
 
 class Labeled<P : Policy, E> {
@@ -14,6 +14,7 @@ class Labeled<P : Policy, E> {
     }
 
     // set value of this to value of other, if policy allows
+    context(PolicyEvaluationContext)
     fun <OtherPolicy : Policy> accept(other: Labeled<OtherPolicy, E>) {
         if (allowedToFlow(other.policy, this.policy)) {
             value = other.value
@@ -22,10 +23,10 @@ class Labeled<P : Policy, E> {
         }
     }
 
-    context(PolicyEvaluationContext)
-    fun <OtherPolicy : Policy> accept(other: Labeled<OtherPolicy, E>) {
-        TODO()
-    }
+//    context(PolicyEvaluationContext)
+//    fun <OtherPolicy : Policy> accept(other: Labeled<OtherPolicy, E>) {
+//        TODO()
+//    }
 
     // produce new labeled from value of this
     fun <R> produce(producer: SecuredContext<P>.(E) -> R): Labeled<P, R> {
@@ -36,10 +37,12 @@ class Labeled<P : Policy, E> {
         value = v
     }
 
-    context(SecuredContext<PolicyFrom>)
-    fun <PolicyFrom> set(v: E) {
+    context(SecuredContext<PolicyFrom>, PolicyEvaluationContext)
+    fun <PolicyFrom : Policy> set(v: E) {
         if (allowedToFlow(this@SecuredContext.policy, this.policy)) {
-
+            value = v
+        } else {
+            throw InformationFlowException()
         }
     }
 }
@@ -52,14 +55,17 @@ fun <P : Policy, T> labeled(policy: P, builder: () -> T): Labeled<P, T> {
 //    allowedToFlow(From::class, To::class)
 //}
 
+context(PolicyEvaluationContext)
 fun allowedToFlow(from: Policy, to: Policy): Boolean {
     return to.objectReceivers.all { obj ->
-        from.objectReceivers.contains(obj) || from.classReceivers.any { klass ->
-            klass.isInstance(obj)
-        } && to.classReceivers.all { toClass ->
-            from.classReceivers.any { fromClass ->
-                toClass.java.isAssignableFrom(fromClass.java)
-            }
+        from.objectReceivers.contains(obj) || from.lockedReceivers.any { locked ->
+            locked.receiverClass.isInstance(obj) && lockExpressionContext[locked.lock] == true
+        }
+    } && to.lockedReceivers.all { toLocked ->
+        from.lockedReceivers.any { fromLocked ->
+            toLocked.receiverClass.java.isAssignableFrom(fromLocked.receiverClass.java) &&
+                    (toLocked.lock == fromLocked.lock ||
+                            lockExpressionContext[toLocked.lock] == true && lockExpressionContext[fromLocked.lock] == true)
         }
     }
 }
@@ -71,10 +77,12 @@ class SecuredContext<P : Policy> {
     }
 }
 
-class PolicyEvaluationContext(val map: Map<LockExpression, Boolean>)
+class PolicyEvaluationContext(val lockExpressionContext: Map<LockExpression, Boolean>)
 
 fun withPolicyEvaluationContext(vararg lockExpressions: LockExpression, f: PolicyEvaluationContext.() -> Unit) {
     PolicyEvaluationContext(buildMap {
+        put(TrueLockExpression, true)
+        put(FalseLockExpression, false)
         lockExpressions.forEach {
             put(it, it.evaluate())
         }

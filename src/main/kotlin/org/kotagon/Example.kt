@@ -1,6 +1,5 @@
 package org.kotagon
 
-import org.kotagon.Paid
 
 class Customer
 object Paid : UnaryLock<Customer>()
