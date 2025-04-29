@@ -1,15 +1,9 @@
 package org.kotagon
 
+import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Test
+import org.kotagon.exception.InformationFlowException
 
-class Customer
-object Paid : UnaryLock<Customer>()
-
-object AnyCustomer : Policy({
-    any<Customer>() // same as suchThat<Customer> { true }
-})
-object PaidCustomer : Policy({
-    suchThat<Customer> { customer -> Paid(customer) }
-})
 
 class CustomerData(var data: String, var softwareKey: String?)
 
@@ -21,7 +15,7 @@ class CustomerStorage {
     }
 }
 
-class KeySeller {
+private class ComplexKeySeller(val processPayment: (Customer) -> Boolean) {
     val customerStorage: CustomerStorage = CustomerStorage()
     val softwareKey: Labeled<PaidCustomer, String> = labeled(PaidCustomer) { "secretKey" }
 
@@ -38,8 +32,21 @@ class KeySeller {
             }
         }
     }
+}
 
-    private fun processPayment(customer: Customer): Boolean {
-        TODO("Not yet implemented")
+class ComplexSoftwareKeyTest {
+
+    @Test
+    fun testLegalFlow() {
+        val keySeller = ComplexKeySeller { true }
+        keySeller.getSoftwareKey(Customer())
+    }
+
+    @Test
+    fun testIllegalFlow() {
+        val keySeller = ComplexKeySeller { false }
+        assertThrows (InformationFlowException::class.java) {
+            keySeller.getSoftwareKey(Customer())
+        }
     }
 }

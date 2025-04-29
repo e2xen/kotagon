@@ -1,12 +1,11 @@
 package org.kotagon
 
-import jdk.dynalink.linker.support.Guards.isInstance
 import org.kotagon.exception.InformationFlowException
 
 class Labeled<P : Policy, E> {
     // policy-protected value
     var value: E
-    val policy: Policy
+    val policy: P
 
     internal constructor(p: P, v: E) {
         value = v
@@ -29,8 +28,9 @@ class Labeled<P : Policy, E> {
 //    }
 
     // produce new labeled from value of this
-    fun <R> produce(producer: SecuredContext<P>.(E) -> R): Labeled<P, R> {
-        TODO()
+    context(PolicyEvaluationContext)
+    fun <R> map(mapper: context(SecuredContext<P>, PolicyEvaluationContext) (E) -> R): Labeled<P, R> {
+        return labeled(policy) { mapper(SecuredContext<P>(policy), this@PolicyEvaluationContext, value) }
     }
 
     fun set(v: E) {
@@ -41,6 +41,15 @@ class Labeled<P : Policy, E> {
     fun <PolicyFrom : Policy> set(v: E) {
         if (allowedToFlow(this@SecuredContext.policy, this.policy)) {
             value = v
+        } else {
+            throw InformationFlowException()
+        }
+    }
+
+    context(SecuredContext<PolicyFrom>, PolicyEvaluationContext)
+    fun <PolicyFrom : Policy> get(): E {
+        if (allowedToFlow(this.policy, this@SecuredContext.policy)) {
+            return this.value
         } else {
             throw InformationFlowException()
         }
@@ -71,7 +80,7 @@ fun allowedToFlow(from: Policy, to: Policy): Boolean {
 }
 
 class SecuredContext<P : Policy> {
-    val policy: Policy
+    val policy: P
     internal constructor(p: P) {
         policy = p
     }
