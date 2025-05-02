@@ -1,5 +1,8 @@
 package org.kotagon
 
+import org.kotagon.lock.LockExpression
+import org.kotagon.lock.LockStubArg
+import org.kotagon.lock.TrueLockExpression
 import kotlin.reflect.KClass
 
 abstract class Policy {
@@ -11,6 +14,10 @@ abstract class Policy {
         objectReceivers = ctx.objectReceivers
         lockedReceivers = ctx.lockedReceivers
         //...
+    }
+
+    override fun toString(): String {
+        return "Policy{objectReceivers=$objectReceivers, lockedReceivers=$lockedReceivers}"
     }
 }
 

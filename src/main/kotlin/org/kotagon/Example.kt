@@ -1,5 +1,7 @@
 package org.kotagon
 
+import org.kotagon.lock.UnaryLock
+
 
 class Customer
 object Paid : UnaryLock<Customer>()
@@ -40,6 +42,6 @@ class KeySeller {
     }
 
     private fun processPayment(customer: Customer): Boolean {
-        TODO("Not yet implemented")
+        return true
     }
 }
