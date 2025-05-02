@@ -36,6 +36,4 @@ class SoftwareKeyTest {
         })
     }
 
-    // TODO: add test after Paid.close(customer)
-
 }

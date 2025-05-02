@@ -25,19 +25,10 @@ class Labeled<P : Policy, E> {
         }
     }
 
-//    context(PolicyEvaluationContext)
-//    fun <OtherPolicy : Policy> accept(other: Labeled<OtherPolicy, E>) {
-//        TODO()
-//    }
-
     // produce new labeled from value of this
     context(PolicyEvaluationContext)
     fun <R> map(mapper: context(SecuredContext<P>, PolicyEvaluationContext) (E) -> R): Labeled<P, R> {
         return labeled(policy) { mapper(SecuredContext<P>(policy), this@PolicyEvaluationContext, value) }
-    }
-
-    fun set(v: E) {
-        value = v
     }
 
     context(SecuredContext<PolicyFrom>, PolicyEvaluationContext)
@@ -99,13 +90,4 @@ fun withPolicyEvaluationContext(vararg lockExpressions: LockExpression, f: Polic
             put(it, it.evaluate())
         }
     }).also { it.f() }
-}
-
-// move to LabeledExtensions.kt
-fun <P : Policy> Labeled<P, Boolean>.ifTrue(action: SecuredContext<P>.() -> Unit) {
-    TODO()
-}
-
-fun <P : Policy> Labeled<P, Boolean>.ifFalse(action: SecuredContext<P>.() -> Unit) {
-    TODO()
 }

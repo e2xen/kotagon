@@ -13,7 +13,6 @@ abstract class Policy {
         val ctx = PolicyBuilderContext().apply(builder)
         objectReceivers = ctx.objectReceivers
         lockedReceivers = ctx.lockedReceivers
-        //...
     }
 
     override fun toString(): String {
