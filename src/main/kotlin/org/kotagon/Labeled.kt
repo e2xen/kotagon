@@ -40,6 +40,7 @@ class Labeled<P : Policy, E> {
         }
     }
 
+    // SecuredContext<PolicyFrom> - кто вызвал?
     context(SecuredContext<PolicyFrom>, PolicyEvaluationContext)
     fun <PolicyFrom : Policy> get(): E {
         if (allowedToFlow(this.policy, this@SecuredContext.policy)) {

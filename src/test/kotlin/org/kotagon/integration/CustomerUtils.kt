@@ -1,5 +1,6 @@
-package org.kotagon
+package org.kotagon.integration
 
+import org.kotagon.Policy
 import org.kotagon.lock.UnaryLock
 
 class Customer

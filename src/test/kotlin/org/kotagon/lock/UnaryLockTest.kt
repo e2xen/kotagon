@@ -1,7 +1,7 @@
 package org.kotagon.lock
 
 import org.junit.jupiter.api.Test
-import org.kotagon.Customer
+import org.kotagon.integration.Customer
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 

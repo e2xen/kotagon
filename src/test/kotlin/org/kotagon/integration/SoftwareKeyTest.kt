@@ -1,8 +1,11 @@
-package org.kotagon
+package org.kotagon.integration
 
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.kotagon.Labeled
 import org.kotagon.exception.InformationFlowException
+import org.kotagon.labeled
+import org.kotagon.withPolicyEvaluationContext
 
 private class SimpleKeySeller(val processPayment: (Customer) -> Boolean) {
     val customerData: Labeled<AnyCustomer, String> = labeled(AnyCustomer) { "" }

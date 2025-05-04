@@ -1,8 +1,12 @@
-package org.kotagon
+package org.kotagon.integration
 
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
+import org.kotagon.Labeled
+import org.kotagon.Policy
 import org.kotagon.exception.InformationFlowException
+import org.kotagon.labeled
+import org.kotagon.withPolicyEvaluationContext
 
 
 class CustomerData(var data: String, var softwareKey: String?)
