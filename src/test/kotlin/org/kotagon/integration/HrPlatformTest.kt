@@ -24,7 +24,7 @@ private class CeoUser(name: String): User(name, Role.CEO)
 // Define politics
 private class SpecificUser(user: User) : Policy({ +user })
 private object AnyEmployee: Policy({
-    any(User::class)
+    any<User>()
 })
 private object AnyCLevelUser: Policy({
     any(CtoUser::class)
@@ -44,21 +44,18 @@ private class HrPlatform {
 
     fun getUserProfile(user: User, profileId: Long): Labeled<SpecificUser, ProfileInfo> {
         val result: Labeled<SpecificUser, ProfileInfo> = labeled(SpecificUser(user)) { ProfileInfo(null) }
-        withPolicyEvaluationContext {
+        return withPolicyEvaluationContext {
             result.map {
-                it.data = profileStorage.get()[profileId]?.toString()
+                ProfileInfo(profileStorage.get()[profileId]?.toString())
             }
         }
-        return result
     }
 
     fun getCompanyStrategy(user: User): Labeled<SpecificUser, CompanyStrategy> {
         val result = labeled(SpecificUser(user)) { CompanyStrategy(null) }
-        var res: String? = null
         withPolicyEvaluationContext {
             result.map {
                 it.data = companyStrategy.get()
-                res = companyStrategy.get()
             }
         }
         return result

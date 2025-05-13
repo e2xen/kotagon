@@ -4,6 +4,7 @@ import org.kotagon.exception.InformationFlowException
 import org.kotagon.lock.FalseLockExpression
 import org.kotagon.lock.LockExpression
 import org.kotagon.lock.TrueLockExpression
+import javax.swing.UIManager.put
 
 class Labeled<P : Policy, E> {
     // policy-protected value
@@ -83,12 +84,13 @@ class SecuredContext<P : Policy> {
 
 class PolicyEvaluationContext(val lockExpressionContext: Map<LockExpression, Boolean>)
 
-fun withPolicyEvaluationContext(vararg lockExpressions: LockExpression, f: PolicyEvaluationContext.() -> Unit) {
-    PolicyEvaluationContext(buildMap {
+fun <T> withPolicyEvaluationContext(vararg lockExpressions: LockExpression, f: PolicyEvaluationContext.() -> T): T {
+    val ctx = PolicyEvaluationContext(buildMap {
         put(TrueLockExpression, true)
         put(FalseLockExpression, false)
         lockExpressions.forEach {
             put(it, it.evaluate())
         }
-    }).also { it.f() }
+    })
+    return ctx.f()
 }
