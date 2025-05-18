@@ -10,18 +10,19 @@ import org.kotagon.labeled
 import org.kotagon.withPolicyEvaluationContext
 
 
-object HighLevel
-object LowLevel
-object HighPolicy : Policy({
+private object HighLevel
+private object LowLevel
+private object HighPolicy : Policy({
     +HighLevel
 })
-object LowPolicy : Policy({
+
+private object LowPolicy : Policy({
     +HighLevel
     +LowLevel
 })
 
-class HighSubjectActor {
-    private val data: Labeled<HighPolicy, String> = labeled(HighPolicy) {"highSubject"}
+private class HighSubjectActor {
+    private val data: Labeled<HighPolicy, String> = labeled(HighPolicy) { "highSubject" }
     fun readFrom(obj: Labeled<*, String>) {
         withPolicyEvaluationContext {
             data.accept(obj)
@@ -34,14 +35,13 @@ class HighSubjectActor {
     }
 }
 
-class LowSubjectActor {
-    private val data: Labeled<LowPolicy, String> = labeled(LowPolicy) {"lowSubject"}
+private class LowSubjectActor {
+    private val data: Labeled<LowPolicy, String> = labeled(LowPolicy) { "lowSubject" }
     fun readFrom(obj: Labeled<*, String>) {
         withPolicyEvaluationContext {
             data.accept(obj)
         }
     }
-
     fun writeTo(obj: Labeled<*, String>) {
         withPolicyEvaluationContext {
             obj.accept(data)
@@ -50,10 +50,10 @@ class LowSubjectActor {
 }
 
 class BellLaPadulaTest {
-    lateinit var highObject: Labeled<HighPolicy, String>
-    lateinit var lowObject: Labeled<LowPolicy, String>
-    lateinit var highSubject: HighSubjectActor
-    lateinit var lowSubject: LowSubjectActor
+    private lateinit var highObject: Labeled<HighPolicy, String>
+    private lateinit var lowObject: Labeled<LowPolicy, String>
+    private lateinit var highSubject: HighSubjectActor
+    private lateinit var lowSubject: LowSubjectActor
 
     @BeforeEach
     fun before() {

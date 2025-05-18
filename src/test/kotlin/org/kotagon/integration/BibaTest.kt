@@ -10,17 +10,17 @@ import org.kotagon.labeled
 import org.kotagon.withPolicyEvaluationContext
 
 
-object TrustedLevel
-object UntrustedLevel
-object TrustedPolicy : Policy({
+private object TrustedLevel
+private object UntrustedLevel
+private object TrustedPolicy : Policy({
     +TrustedLevel
     +UntrustedLevel
 })
-object UntrustedPolicy : Policy({
+private object UntrustedPolicy : Policy({
     +UntrustedLevel
 })
 
-class TrustedSubjectActor {
+private class TrustedSubjectActor {
     private val data: Labeled<TrustedPolicy, String> = labeled(TrustedPolicy) {"trustedSubject"}
     fun readFrom(obj: Labeled<*, String>) {
         withPolicyEvaluationContext {
@@ -34,7 +34,7 @@ class TrustedSubjectActor {
     }
 }
 
-class UntrustedSubjectActor {
+private class UntrustedSubjectActor {
     private val data: Labeled<UntrustedPolicy, String> = labeled(UntrustedPolicy) {"untrustedSubject"}
     fun readFrom(obj: Labeled<*, String>) {
         withPolicyEvaluationContext {
@@ -50,10 +50,10 @@ class UntrustedSubjectActor {
 }
 
 class BibaTest {
-    lateinit var trustedObject: Labeled<TrustedPolicy, String>
-    lateinit var untrustedObject: Labeled<UntrustedPolicy, String>
-    lateinit var trustedSubject: TrustedSubjectActor
-    lateinit var untrustedSubject: UntrustedSubjectActor
+    private lateinit var trustedObject: Labeled<TrustedPolicy, String>
+    private lateinit var untrustedObject: Labeled<UntrustedPolicy, String>
+    private lateinit var trustedSubject: TrustedSubjectActor
+    private lateinit var untrustedSubject: UntrustedSubjectActor
 
     @BeforeEach
     fun before() {
