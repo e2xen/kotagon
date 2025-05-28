@@ -13,14 +13,14 @@ abstract class UnaryLock<in T>() : Lock() {
         return PureUnaryLockExpression(this, null)
     }
 
-    fun open(v: T) {
+    open fun open(v: T) {
         states[v] = true
     }
-    fun close(v: T) {
+    open fun close(v: T) {
         states[v] = false
     }
 
-    fun isOpen(v: T): Boolean {
+    open fun isOpen(v: T): Boolean {
         return states[v] == true
     }
     fun isClosed(v: T) = !isOpen(v)

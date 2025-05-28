@@ -1,6 +1,5 @@
 package org.kotagon
 
-// move to LabeledExtensions.kt
 fun <P : Policy> Labeled<P, Boolean>.ifTrue(action: SecuredContext<P>.() -> Unit) {
     TODO()
 }

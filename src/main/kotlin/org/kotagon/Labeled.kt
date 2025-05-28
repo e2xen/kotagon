@@ -4,7 +4,6 @@ import org.kotagon.exception.InformationFlowException
 import org.kotagon.lock.FalseLockExpression
 import org.kotagon.lock.LockExpression
 import org.kotagon.lock.TrueLockExpression
-import javax.swing.UIManager.put
 
 class Labeled<P : Policy, E> {
     // policy-protected value

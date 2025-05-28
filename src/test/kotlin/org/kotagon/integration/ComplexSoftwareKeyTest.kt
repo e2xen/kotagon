@@ -19,9 +19,15 @@ class CustomerStorage {
     }
 }
 
+class KeyGenerator {
+    fun generateKey(): Labeled<PaidCustomer, String> {
+        return labeled(PaidCustomer) { "secretKey" }
+    }
+}
+
 private class ComplexKeySeller(val processPayment: (Customer) -> Boolean) {
     val customerStorage: CustomerStorage = CustomerStorage()
-    val softwareKey: Labeled<PaidCustomer, String> = labeled(PaidCustomer) { "secretKey" }
+    val keyGenerator: KeyGenerator = KeyGenerator()
 
     fun getSoftwareKey(customer: Customer) {
         val customerData = customerStorage.getCustomerData(customer)
@@ -32,7 +38,7 @@ private class ComplexKeySeller(val processPayment: (Customer) -> Boolean) {
         }
         withPolicyEvaluationContext(Paid(customer)) {
             customerData.map {
-                it.softwareKey = softwareKey.get()
+                it.softwareKey = keyGenerator.generateKey().get()
             }
         }
     }
