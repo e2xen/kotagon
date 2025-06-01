@@ -9,17 +9,17 @@ import org.kotagon.labeled
 import org.kotagon.withPolicyEvaluationContext
 
 
-class CustomerData(var data: String, var softwareKey: String?)
+private class CustomerData(var data: String, var softwareKey: String?)
 
-class SpecificCustomer(customer: Customer) : Policy({ +customer })
+private class SpecificCustomer(customer: Customer) : Policy({ +customer })
 
-class CustomerStorage {
+private class CustomerStorage {
     fun getCustomerData(customer: Customer): Labeled<SpecificCustomer, CustomerData> {
         return labeled(SpecificCustomer(customer)) { CustomerData("name", null) }
     }
 }
 
-class KeyGenerator {
+private class KeyGenerator {
     fun generateKey(): Labeled<PaidCustomer, String> {
         return labeled(PaidCustomer) { "secretKey" }
     }
