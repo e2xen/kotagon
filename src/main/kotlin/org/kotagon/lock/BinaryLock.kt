@@ -11,6 +11,12 @@ abstract class BinaryLock<in T1, in T2> : Lock() {
     operator fun invoke(v1: LockStubArg<out T1>, v2: LockStubArg<out T2>): LockExpression {
         return PureBinaryLockExpression(this, null, null)
     }
+    operator fun invoke(v1: T1, v2: LockStubArg<out T2>): LockExpression {
+        return PureBinaryLockExpression(this, v1, null)
+    }
+    operator fun invoke(v1: LockStubArg<out T1>, v2: T2): LockExpression {
+        return PureBinaryLockExpression(this, null, v2)
+    }
 
     fun open(v1: T1, v2: T2) {
         states[Pair(v1, v2)] = true

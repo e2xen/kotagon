@@ -27,7 +27,7 @@ class AndLockExpression(
     override fun evaluate() = expr1.evaluate() && expr2.evaluate()
 
     override fun equals(other: Any?) = other is AndLockExpression &&
-            this.expr1 == other.expr1 && this.expr2 == other.expr2
+            (this.expr1 == other.expr1 && this.expr2 == other.expr2 || this.expr1 == other.expr2 && this.expr2 == other.expr1)
     override fun hashCode() = 25
 }
 
@@ -38,7 +38,7 @@ class OrLockExpression(
     override fun evaluate() = expr1.evaluate() || expr2.evaluate()
 
     override fun equals(other: Any?) = other is OrLockExpression &&
-            this.expr1 == other.expr1 && this.expr2 == other.expr2
+            (this.expr1 == other.expr1 && this.expr2 == other.expr2 || this.expr1 == other.expr2 && this.expr2 == other.expr1)
     override fun hashCode() = 25
 }
 

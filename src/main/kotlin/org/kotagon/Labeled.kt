@@ -7,7 +7,7 @@ import org.kotagon.lock.TrueLockExpression
 
 class Labeled<P : Policy, E> {
     // policy-protected value
-    var value: E
+    internal var value: E
     val policy: P
 
     internal constructor(p: P, v: E) {
@@ -48,6 +48,8 @@ class Labeled<P : Policy, E> {
             throw InformationFlowException()
         }
     }
+
+    fun unsafeGet() = value
 }
 
 fun <P : Policy, T> labeled(policy: P, builder: () -> T): Labeled<P, T> {
