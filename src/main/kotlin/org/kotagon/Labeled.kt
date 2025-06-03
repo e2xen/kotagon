@@ -64,20 +64,15 @@ context(PolicyEvaluationContext)
 fun allowedToFlow(from: Policy, to: Policy): Boolean {
     return to.objectReceivers.all { obj ->
         from.objectReceivers.contains(obj) || from.lockedReceivers.any { locked ->
-            locked.receiverClasses.any { receiverClass ->
-                receiverClass.isInstance(obj) && lockExpressionContext[locked.lock] == true
-            }
+            locked.receiverClass.isInstance(obj) && lockExpressionContext[locked.lock] == true
         }
     } && to.lockedReceivers.all { toLocked ->
         from.lockedReceivers.any { fromLocked ->
-            toLocked.receiverClasses.any { toReceiverClass ->
-                fromLocked.receiverClasses.any { fromReceiverClass ->
-                    toReceiverClass.java.isAssignableFrom(fromReceiverClass.java) &&
-                            (toLocked.lock == fromLocked.lock ||
-                                lockExpressionContext[toLocked.lock] == true && lockExpressionContext[fromLocked.lock] == true)
-                }}
-            }
+            toLocked.receiverClass.java.isAssignableFrom(fromLocked.receiverClass.java) &&
+                    (toLocked.lock == fromLocked.lock ||
+                            lockExpressionContext[toLocked.lock] == true && lockExpressionContext[fromLocked.lock] == true)
         }
+    }
 }
 
 class SecuredContext<P : Policy> {
