@@ -47,7 +47,7 @@ class LabeledTest {
     }
 
     @Test
-    @DisplayName("The information flow is allowed to more strict policy")
+    @DisplayName("The information can flow to more restrictive policy")
     fun testAllowedToFlowStrictPolicy() {
         withPolicyEvaluationContext {
             assertTrue(allowedToFlow(AnyStringPolicy, ConcreteStringPolicy))
@@ -55,7 +55,7 @@ class LabeledTest {
     }
 
     @Test
-    @DisplayName("The information flow is not allowed to more general policy")
+    @DisplayName("The information cannot flow to more liberal policy")
     fun testNotAllowedToFlowGeneralPolicy() {
         withPolicyEvaluationContext {
             assertFalse(allowedToFlow(ConcreteStringPolicy, AnyStringPolicy))
