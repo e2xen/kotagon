@@ -6,6 +6,10 @@ import org.kotagon.lock.LockExpression
 import org.kotagon.lock.TrueLockExpression
 
 class Labeled<P : Policy, E> {
+    companion object {
+        private const val ILLEGAL_FLOW_TEMPLATE = "Illegal flow detected: '%s' -> '%s'"
+    }
+
     // policy-protected value
     internal var value: E
     val policy: P
@@ -18,10 +22,12 @@ class Labeled<P : Policy, E> {
     // set value of this to value of other, if policy allows
     context(PolicyEvaluationContext)
     fun <OtherPolicy : Policy> accept(other: Labeled<OtherPolicy, E>) {
-        if (allowedToFlow(other.policy, this.policy)) {
+        val from = other.policy
+        val to = this.policy
+        if (allowedToFlow(from, to)) {
             value = other.value
         } else {
-            throw InformationFlowException()
+            throw InformationFlowException(ILLEGAL_FLOW_TEMPLATE.format(from.getPolicyName(), to.getPolicyName()))
         }
     }
 
@@ -33,19 +39,23 @@ class Labeled<P : Policy, E> {
 
     context(SecuredContext<PolicyFrom>, PolicyEvaluationContext)
     fun <PolicyFrom : Policy> set(v: E) {
-        if (allowedToFlow(this@SecuredContext.policy, this.policy)) {
+        val from = this@SecuredContext.policy
+        val to = this.policy
+        if (allowedToFlow(from, to)) {
             value = v
         } else {
-            throw InformationFlowException()
+            throw InformationFlowException(ILLEGAL_FLOW_TEMPLATE.format(from.getPolicyName(), to.getPolicyName()))
         }
     }
 
     context(SecuredContext<PolicyFrom>, PolicyEvaluationContext)
     fun <PolicyFrom : Policy> get(): E {
-        if (allowedToFlow(this.policy, this@SecuredContext.policy)) {
+        val from = this.policy
+        val to = this@SecuredContext.policy
+        if (allowedToFlow(from, to)) {
             return this.value
         } else {
-            throw InformationFlowException()
+            throw InformationFlowException(ILLEGAL_FLOW_TEMPLATE.format(from.getPolicyName(), to.getPolicyName()))
         }
     }
 

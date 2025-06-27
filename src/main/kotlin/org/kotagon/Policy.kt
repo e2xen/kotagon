@@ -15,9 +15,7 @@ abstract class Policy {
         lockedReceivers = ctx.lockedReceivers
     }
 
-    override fun toString(): String {
-        return "Policy{objectReceivers=$objectReceivers, lockedReceivers=$lockedReceivers}"
-    }
+    fun getPolicyName(): String? = this::class.qualifiedName
 }
 
 data class LockedReceiver(
