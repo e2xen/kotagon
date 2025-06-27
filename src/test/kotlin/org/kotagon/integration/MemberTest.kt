@@ -1,6 +1,5 @@
 package org.kotagon.integration
 
-import jdk.internal.org.jline.utils.Colors.s
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
