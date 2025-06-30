@@ -6,10 +6,6 @@ import org.kotagon.lock.LockExpression
 import org.kotagon.lock.TrueLockExpression
 
 class Labeled<P : Policy, E> {
-    companion object {
-        private const val ILLEGAL_FLOW_TEMPLATE = "Illegal flow detected: '%s' -> '%s'"
-    }
-
     // policy-protected value
     internal var value: E
     val policy: P
@@ -27,7 +23,7 @@ class Labeled<P : Policy, E> {
         if (allowedToFlow(from, to)) {
             value = other.value
         } else {
-            throw InformationFlowException(ILLEGAL_FLOW_TEMPLATE.format(from.getPolicyName(), to.getPolicyName()))
+            throw InformationFlowException(from, to)
         }
     }
 
@@ -37,6 +33,17 @@ class Labeled<P : Policy, E> {
         return labeled(policy) { mapper(SecuredContext<P>(policy), this@PolicyEvaluationContext, value) }
     }
 
+    context(PolicyEvaluationContext)
+    fun <PNew : Policy> switch(newPolicy: PNew): Labeled<PNew, E> {
+        val from = policy
+        val to = newPolicy
+        if (allowedToFlow(from, to)) {
+            return labeled(newPolicy) { value }
+        } else {
+            throw InformationFlowException(from, to)
+        }
+    }
+
     context(SecuredContext<PolicyFrom>, PolicyEvaluationContext)
     fun <PolicyFrom : Policy> set(v: E) {
         val from = this@SecuredContext.policy
@@ -44,7 +51,7 @@ class Labeled<P : Policy, E> {
         if (allowedToFlow(from, to)) {
             value = v
         } else {
-            throw InformationFlowException(ILLEGAL_FLOW_TEMPLATE.format(from.getPolicyName(), to.getPolicyName()))
+            throw InformationFlowException(from, to)
         }
     }
 
@@ -55,7 +62,7 @@ class Labeled<P : Policy, E> {
         if (allowedToFlow(from, to)) {
             return this.value
         } else {
-            throw InformationFlowException(ILLEGAL_FLOW_TEMPLATE.format(from.getPolicyName(), to.getPolicyName()))
+            throw InformationFlowException(from, to)
         }
     }
 
@@ -65,10 +72,6 @@ class Labeled<P : Policy, E> {
 fun <P : Policy, T> labeled(policy: P, builder: () -> T): Labeled<P, T> {
     return Labeled(policy, builder())
 }
-
-//inline fun <reified From : Policy, reified To : Policy> allowedToFlow() {
-//    allowedToFlow(From::class, To::class)
-//}
 
 context(PolicyEvaluationContext)
 fun allowedToFlow(from: Policy, to: Policy): Boolean {

@@ -1,5 +1,6 @@
 package org.kotagon.lock
 
+import org.kotagon.Labeled
 import org.kotagon.exception.AbstractLockExpressionException
 
 abstract class UnaryLock<in T>() : Lock() {
@@ -8,6 +9,8 @@ abstract class UnaryLock<in T>() : Lock() {
     operator fun invoke(v: T): LockExpression {
         return PureUnaryLockExpression(this, v)
     }
+
+    operator fun invoke(v: Labeled<*, @UnsafeVariance T>) = invoke(v.unsafeGet())
 
     operator fun invoke(v: LockStubArg<out T>): LockExpression {
         return PureUnaryLockExpression(this, null)
